@@ -90,9 +90,8 @@ ZoteroCitationCounts = {
   },
 
   icon: function (iconName, hiDPI) {
-    return `chrome://zotero/skin/${iconName}${
-      hiDPI ? (Zotero.hiDPI ? "@2x" : "") : ""
-    }.png`;
+    return `chrome://zotero/skin/${iconName}${hiDPI ? (Zotero.hiDPI ? "@2x" : "") : ""
+      }.png`;
   },
 
   /////////////////////////////////////////////
@@ -181,9 +180,9 @@ ZoteroCitationCounts = {
         api.key === "none"
           ? { "data-l10n-id": "citationcounts-menutools-autoretrieve-api-none" }
           : {
-              "data-l10n-id": "citationcounts-menutools-autoretrieve-api",
-              "data-l10n-args": `{"api": "${api.name}"}`,
-            };
+            "data-l10n-id": "citationcounts-menutools-autoretrieve-api",
+            "data-l10n-args": `{"api": "${api.name}"}`,
+          };
 
       this._injectXULElement(
         document,
@@ -301,25 +300,21 @@ ZoteroCitationCounts = {
     const items = itemsRaw.filter((item) => !item.isFeedItem);
     if (!items.length) return;
 
-    const progressWindow = new Zotero.ProgressWindow();
-    progressWindow.changeHeadline(
-      await this.l10n.formatValue("citationcounts-progresswindow-headline", {
-        api: api.name,
-      }),
-      this.icon("toolbar-advanced-search")
-    );
-
-    const progressWindowItems = [];
-    const itemTitles = items.map((item) => item.getField("title"));
-    itemTitles.forEach((title) => {
-      progressWindowItems.push(
-        new progressWindow.ItemProgress(this.icon("spinner-16px"), title)
-      );
-    });
-
-    progressWindow.show();
-
-    this._updateItem(0, items, api, progressWindow, progressWindowItems);
+    for (const item of items) {
+      try {
+        const [count, source] = await this._retrieveCitationCount(
+          item,
+          api.name,
+          api.useDoi,
+          api.useArxiv,
+          api.methods.urlBuilder,
+          api.methods.responseCallback
+        );
+        this._setCitationCount(item, source, count);
+      } catch (error) {
+        // Log the error or handle it silently
+      }
+    }
   },
 
   /**
@@ -549,10 +544,10 @@ ZoteroCitationCounts = {
 
   // The callback can be async if we want.
   _semanticScholarCallback: async function (response) {
-    count = response["citationCount"];
+    const count = response["citationCount"];
 
-    // throttle Semantic Scholar so we don't reach limit.
-    await new Promise((r) => setTimeout(r, 3000));
+    // Implement any necessary delay to prevent rate limit issues, if needed
+    await new Promise((r) => setTimeout(r, 3000)); // delay example
     return count;
   },
 };

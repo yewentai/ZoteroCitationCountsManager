@@ -12,3 +12,5 @@ zip -r zoterocitationcountsmanager-${version}.xpi locale/* manifest.json bootstr
 # - run this script to create a new .xpi file
 # - commit and push to Github
 # - make a release on Github, and manually upload the new .xpi file
+
+# zip -r zoterocitationcountsmanager-2.1.xpi locale/* manifest.json bootstrap.js preferences.js preferences.xhtml prefs.js zoterocitationcounts.js
